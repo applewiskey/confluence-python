@@ -28,10 +28,15 @@ class ConfluencePage(object):
             self.set_label()
         return {"url": self.page_url, "id": self.page_id}
 
-    def update(self,content,parent_id=0):
+    def update(self,content,parent_id=0,notify=True,comment=""):
         self.remove()
         self.parent_id = parent_id
         self.add(str(parent_id),content)
+
+        page = self.server.confluence2.getPage(self.token, self.spaceKey, self.name)
+        page["content"] = content
+        pageupdateoptions={"versionComment":comment,"minorEdit":not notify}
+        self.server.confluence2.updatePage(self.token,page,pageupdateoptions)
 
     def get(self):
         self.wanted_page = self.server.confluence2.getPage(self.token, self.spaceKey, self.name)
